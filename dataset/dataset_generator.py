@@ -7,9 +7,9 @@ import cv2
 import os
 
 
-INPUT_FOLDER = "/dataset/originals/"
-OUTPUT_GOOD = "/dataset/approveds/"
-OUTPUT_BAD = "/dataset/failures/"
+INPUT_FOLDER = "dataset/originals/"
+OUTPUT_GOOD = "dataset/approveds/"
+OUTPUT_BAD = "dataset/failures/"
 
 TARGET_SIZE = 640
 
@@ -43,7 +43,7 @@ def apply_focus_blur(img):
     return cv2.GaussianBlur(img, (k, k), 0)
 
 def apply_exposure_error(img):
-    gamma = random.uniform([0.3,0.4,2.5,3.5])
+    gamma = random.choice([0.3,0.4,2.5,3.5])
     invGamma = 1.0 / gamma
     table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
     return cv2.LUT(img, table)

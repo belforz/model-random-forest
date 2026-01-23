@@ -1,96 +1,199 @@
 import cv2
 import numpy as np
-from typing import Tuple
+import os
+import random
 
-def load_training_data() -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Carrega dados de treinamento simulados para o modelo de qualidade de imagem.
-    Features: [Nitidez (Variance), Densidade de Bordas (%), Gradiente Magnitude, Entropia]
-    Labels: 1 = Aprovado, 0 = Reprovado
-    """
-    # Dados de Treino (Matriz Float32)
-    # Coluna 0: Nitidez (Variance), Coluna 1: Bordas (Density %), Coluna 2: Gradiente, Coluna 3: Entropia
-    train_data = np.array([
-        [150.0, 15.0, 50.0, 7.0],  # Ótima -> Aprovado
-        [120.0, 13.0, 45.0, 6.5],  # Boa -> Aprovado
-        [100.0, 10.0, 40.0, 6.0],  # Boa -> Aprovado
-        [80.0, 8.0, 35.0, 5.5],    # Zona Cinza -> Aprovado
-        [60.0, 6.0, 30.0, 5.0],    # Zona Cinza -> Reprovado
-        [50.0, 4.0, 25.0, 4.5],    # Ruim -> Reprovado
-        [20.0, 1.0, 15.0, 3.0],    # Péssima -> Reprovado
-        [200.0, 20.0, 60.0, 8.0],  # Excelente -> Aprovado
-        [30.0, 2.0, 20.0, 3.5],    # Muito ruim -> Reprovado
-        [90.0, 9.0, 38.0, 5.8],    # Aceitável -> Aprovado
-    ], dtype=np.float32)
+PATH_APPROVEDS = "dataset/approveds/"
+PATH_FAILURES = "dataset/failures/"
+MODEL_OUTPUT = "technical_model.xml"
 
-    # Rótulos (Inteiros)
-    labels = np.array([1, 1, 1, 1, 0, 0, 0, 1, 0, 1], dtype=np.int32)
+RANGES = {
+    'sharpness': {'low': (10, 59), 'med': (60,100) , 'high': (101,300)},
+    'edges': {'low': (0, 4.9), 'med': (5.0,12.0) , 'high': (12.1,40.0)},
+    'entropy': {'low': (0, 3.5), 'med': (3.6,6.5) , 'high': (6.6,8.0)},
+    'gradient': {'low': (0, 15), 'med': (16,40) , 'high': (41,100)},
+    'exposure':{'ok': (0.0, 0.3)}}
 
-    return train_data, labels
+def extract_features_from_image(img):
+    """Extract features from a given image."""
+    img = cv2.imread(img)
+    if img is None or img.size == 0:
+        print(f"Error reading image: {img}")
+        return None
+    
+    h, w = img.shape[:2]
+    max_dim = 640
+    if max(h, w) > max_dim:
+        scale = max_dim / float(max(h, w))
+        new_w, new_h = int(w * scale), int(h * scale)
+        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
+    
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if gray.size == 0:
+        return None
+    
+    total_pixels = gray.size
+    
+    try:
+        # Sharpness
+        laplacian_var = cv2.Laplacian(gray, cv2.CV_64F)
+        stddev = cv2.meanStdDev(laplacian_var)
+        sharpness = stddev[0].item() ** 2
+        
+        # Edges
+        mean_val = np.mean(gray)
+        std_val = np.std(gray)
+        lower_threshold = max(0, mean_val - std_val)
+        upper_threshold = min(255, mean_val + std_val)
+        edges = cv2.Canny(gray, int(lower_threshold), int(upper_threshold))
+        edge_density = (np.count_nonzero(edges) / total_pixels) * 100.0
+        
+        # Exposure
+        hist = cv2.calcHist([gray], [0] , None, [256], [0, 256])
+        exposure_ratio = (np.sum(hist[:31]) + np.sum(hist[225:])) / total_pixels
+        
+        # Gradient
+        grad_x  = cv2.Sobel(gray, cv2.CV_32F, 1, 0 , ksize=3)
+        grad_y  = cv2.Sobel(gray, cv2.CV_32F, 0, 1 , ksize=3)
+        magnitude = cv2.magnitude(grad_x, grad_y)
+        mean_magnitude = np.mean(magnitude)
+        
+        # Entropy
+        hist_norm = hist.ravel() / total_pixels
+        hist_norm = hist_norm[hist_norm > 0]
+        entropy = -np.sum(hist_norm * np.log2(hist_norm))
+        
+        return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio]
+    except Exception as e:
+        print(f"Error processing image {img}: {e}")
+        return None
 
-def create_and_train_model(train_data: np.ndarray, labels: np.ndarray) -> cv2.ml.RTrees:
-    """
-    Cria e treina um modelo Random Forest usando OpenCV.
-    """
-    # Criar Random Forest
+def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
+    """Generate synthetic data based on predefined rules."""
+    data = []
+    labels = []
+    print(f"Generating {samples_per_rule} synthetic data...")
+    
+    def val(metric, value):
+        min_val, max_val = RANGES[metric][value]
+        return random.uniform(min_val, max_val)
+    
+    ## ---- RULE 1: BLUR IMAGES ---- ##
+    for _ in range(samples_per_rule[1]):
+        vec = [val('sharpness', 'low'),
+               val('edges', 'low'),
+               val('entropy', 'low'),
+               val('gradient', 'low'),
+               val('exposure', 'ok')]
+        data.append(vec)
+        labels.append(0)  # REPROVED
+        
+    ## ---- RULE 2: FOCUS ERROR ---- ##
+    for _ in range(samples_per_rule[1]):
+        vec = [val('sharpness', 'low'),
+               val('edges', 'low'),
+               val('entropy', 'med'),
+                val('gradient', 'low'),
+                val('exposure', 'ok')]
+        data.append(vec)
+        labels.append(0)  # REPROVED
+        
+    ## ---- RULE 3: Bokeh rule ---- ##
+    for _ in range(samples_per_rule[1]):
+        vec = [val('sharpness', 'med'),
+               val('edges', 'med'),
+               val('entropy', 'med'),
+               val('gradient', 'med'),
+               val('exposure', 'ok')]
+        data.append(vec)
+        labels.append(1)  # APPROVED
+    
+    ## ---- RULE 4: Minimalism ---- ##
+    
+    for _ in range(samples_per_rule[1]):
+        vec = [val('sharpness', 'low'),
+               val('edges', 'low'),
+               val('entropy', 'low'),
+               val('gradient', 'low'),
+               val('exposure', 'ok')]
+        data.append(vec)
+        labels.append(1)  # APPROVED
+    
+    ## ---- RULE 5: ISO GRANULATED ---- ##
+    for _ in range(samples_per_rule[1]):
+        vec = [val('sharpness', 'high'),
+               val('edges', 'high'),
+               val('entropy', 'high'),
+               val('gradient', 'high'),
+               val('exposure', 'ok')
+               ]
+        data.append(vec)
+        labels.append(0)  # REPROVED
+    
+    return data, labels
+
+def train():
+    print("----- Initializing hibrid model training( Imagess + Logical Rules) ----")
+    final_data = []
+    final_labels = []
+    print("📂 Processing images and generating synthetic data...")
+    count_imgs = 0
+    
+    if os.path.exists(PATH_APPROVEDS):
+        for f in os.listdir(PATH_APPROVEDS):
+            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                features = extract_features_from_image(os.path.join(PATH_APPROVEDS, f))
+                if features and all(isinstance(feat, (int, float, np.number)) for feat in features):
+                    final_data.append(features)
+                    final_labels.append(1)  # APPROVED
+                    count_imgs += 1
+                else:
+                    print(f"Skipped approved image {f}: features={features}")
+    
+    if os.path.exists(PATH_FAILURES):
+        for f in os.listdir(PATH_FAILURES):
+            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                features = extract_features_from_image(os.path.join(PATH_FAILURES, f))
+                if features and all(isinstance(feat, (int, float, np.number)) for feat in features):
+                    final_data.append(features)
+                    final_labels.append(0)  # REPROVED
+                    count_imgs += 1
+                else:
+                    print(f"Skipped failure image {f}: features={features}")
+    print(f"✅ Processed {count_imgs} images from dataset folders.")
+    synth_data, synth_labels = _generate_synthetic_rule_data(samples_per_rule=(None, 300))
+    final_data.extend(synth_data)
+    final_labels.extend(synth_labels)
+    print(f"✅ Generated {len(synth_data)} synthetic data based on rules.")
+    
+    train_matrix = np.array(final_data, dtype=np.float32)
+    labels_matrix = np.array(final_labels, dtype=np.int32)
+    
+    print("🤖 Dataset is mounted: ")
+    print(f" - Real Imasges: {count_imgs}")
+    print(f" - Synthetic Data: {len(synth_data)}")
+    print(f" - Total Samples: {len(final_data)}")
+    print("⚙️ Training the model...")
+    
     rf = cv2.ml.RTrees_create()
-
-    # Configurações do modelo
     rf.setMaxDepth(10)
-    rf.setMinSampleCount(2)
+    rf.setMinSampleCount(5)
     rf.setRegressionAccuracy(0)
-    rf.setUseSurrogates(False)
     rf.setMaxCategories(2)
     rf.setPriors(np.zeros(0))
-    rf.setCalculateVarImportance(True)
-    rf.setActiveVarCount(0)
-
-    # Critério de parada
-    term_crit = (cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, 100, 0.01)
-    rf.setTermCriteria(term_crit)
-
-    # Preparar dados para treinamento
-    train_data_wrapper = cv2.ml.TrainData_create(train_data, cv2.ml.ROW_SAMPLE, labels)
-
-    # Treinar o modelo
-    rf.train(train_data_wrapper)
-
-    return rf
-
-def test_model(rf: cv2.ml.RTrees, test_samples: np.ndarray) -> np.ndarray:
-    """
-    Testa o modelo com amostras de teste usando 4 features.
-    """
-    predictions = []
-    for sample in test_samples:
-        pred = rf.predict(sample.reshape(1, -1))
-        predictions.append(int(pred[0]))
-    return np.array(predictions)
-
-def main():
-    print("Carregando dados de treinamento...")
-    train_data, labels = load_training_data()
-
-    print("Treinando modelo...")
-    rf = create_and_train_model(train_data, labels)
-
-    # Teste rápido com algumas amostras
-    test_samples = np.array([
-        [140.0, 14.0, 48.0, 6.8],  # Deve aprovar
-        [40.0, 3.0, 22.0, 4.0],    # Deve reprovar
-        [70.0, 7.0, 32.0, 5.2],    # Zona cinza
-    ], dtype=np.float32)
-
-    print("Testando modelo...")
-    predictions = test_model(rf, test_samples)
-    for i, pred in enumerate(predictions):
-        status = "Aprovado" if pred == 1 else "Reprovado"
-        print(f"Amostra {i+1}: {status}")
-
-    # Salvar modelo
-    output_file = "technical_model.xml"
-    rf.save(output_file)
-    print(f"Modelo salvo como '{output_file}'. Pronto para uso no C++!")
-
+    
+    tdata = cv2.ml.TrainData_create(train_matrix, cv2.ml.ROW_SAMPLE, labels_matrix)
+    rf.train(tdata)
+    rf.save(MODEL_OUTPUT)
+    
+    print(f"✅ Model trained and saved to {MODEL_OUTPUT}")
+    print(f"📊 Total samples used: {len(final_data)}")
+    print(f"📊 Features per sample: {len(final_data[0]) if final_data else 0}")
+    print("🎉 Training completed successfully!")
+    
 if __name__ == "__main__":
-    main()
+    train()
+    
+    
+    
+    
