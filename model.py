@@ -12,6 +12,7 @@ RANGES = {
     'edges': {'low': (0, 4.9), 'med': (5.0,12.0) , 'high': (12.1,40.0)},
     'entropy': {'low': (0, 3.5), 'med': (3.6,6.5) , 'high': (6.6,8.0)},
     'gradient': {'low': (0, 15), 'med': (16,40) , 'high': (41,100)},
+    'ratio': {'low': (0, 0.5), 'med': (0.51,1.5) , 'high': (1.51,10.0)},
     'exposure':{'ok': (0.0, 0.3)}}
 
 def extract_features_from_image(img):
@@ -63,7 +64,12 @@ def extract_features_from_image(img):
         hist_norm = hist_norm[hist_norm > 0]
         entropy = -np.sum(hist_norm * np.log2(hist_norm))
         
-        return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio]
+        # Ratio
+        ratio = sharpness /(edge_density + 1e-5)
+        
+        
+        
+        return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio]
     except Exception as e:
         print(f"Error processing image {img}: {e}")
         return None
@@ -84,6 +90,7 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
                val('edges', 'low'),
                val('entropy', 'low'),
                val('gradient', 'low'),
+               val('ratio', 'low'),
                val('exposure', 'ok')]
         data.append(vec)
         labels.append(0)  # REPROVED
@@ -94,6 +101,7 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
                val('edges', 'low'),
                val('entropy', 'med'),
                 val('gradient', 'low'),
+                val('ratio', 'low'),
                 val('exposure', 'ok')]
         data.append(vec)
         labels.append(0)  # REPROVED
@@ -104,6 +112,7 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
                val('edges', 'med'),
                val('entropy', 'med'),
                val('gradient', 'med'),
+                val('ratio', 'high'),
                val('exposure', 'ok')]
         data.append(vec)
         labels.append(1)  # APPROVED
@@ -115,6 +124,7 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
                val('edges', 'low'),
                val('entropy', 'low'),
                val('gradient', 'low'),
+               val('ratio', 'low'),
                val('exposure', 'ok')]
         data.append(vec)
         labels.append(1)  # APPROVED
@@ -125,6 +135,7 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
                val('edges', 'high'),
                val('entropy', 'high'),
                val('gradient', 'high'),
+               val('ratio', 'high'),
                val('exposure', 'ok')
                ]
         data.append(vec)
@@ -176,8 +187,8 @@ def train():
     print("⚙️ Training the model...")
     
     rf = cv2.ml.RTrees_create()
-    rf.setMaxDepth(10)
-    rf.setMinSampleCount(5)
+    rf.setMaxDepth(12)
+    rf.setMinSampleCount(4)
     rf.setRegressionAccuracy(0)
     rf.setMaxCategories(2)
     rf.setPriors(np.zeros(0))

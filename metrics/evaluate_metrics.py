@@ -6,7 +6,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 # --- CONFIG ---
 PATH_APPROVEDS = "dataset/approveds/"
 PATH_REJECTED = "dataset/failures/"
-MODEL_PATH = "/technical_model.xml"
+MODEL_PATH = "technical_model.xml"
 
 def extract_features(image_path):
     img = cv2.imread(image_path)
@@ -50,7 +50,10 @@ def extract_features(image_path):
     hist_norm = hist_norm[hist_norm > 0]
     entropy = -np.sum(hist_norm * np.log2(hist_norm))
         
-    return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio]
+        # Ratio
+    ratio = sharpness / (edge_density + 1e-5)
+        
+    return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio]
 
 def evaluate():
     print(f"--- 📊 Evaluating Model: {MODEL_PATH} ---")

@@ -4,7 +4,7 @@ import os
 
 # --- CONFIG ---
 PATH_APROVADAS = "dataset/approveds/"   
-MODEL_PATH = "/technical_model.xml"   
+MODEL_PATH = "technical_model.xml"   
 
 def extract_features(image_path):
     
@@ -49,8 +49,10 @@ def extract_features(image_path):
     hist_norm = hist.ravel() / total_pixels
     hist_norm = hist_norm[hist_norm > 0]
     entropy = -np.sum(hist_norm * np.log2(hist_norm))
+    
+    ratio = sharpness / (edge_density + 1e-5)
         
-    return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio]
+    return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio]
 
 def find_the_culprits():
     print(f"--- 🕵️ Find the culprits (Errors) ---")
@@ -88,13 +90,14 @@ def find_the_culprits():
                     
                    
                     diagnosis = "Uncertain"
-                    s, e, exp, g, ent = feats
+                    s, e, exp, g, ent, r = feats
                     
                     if s < 60: diagnosis = "Very low sharpness (<60)"
                     elif e < 5.0: diagnosis = "Few edges (<5%)"
                     elif exp > 0.3: diagnosis = "Poor exposure (>30%)"
                     elif ent > 7.5: diagnosis = "High entropy/noise"
                     elif g < 15: diagnosis = "Low gradient (<15)"
+                    elif r > 10: diagnosis = "High sharpness to edge ratio (>10)"
                     else: diagnosis = "Complex combination"
 
                     print(f"{f:<30} | {s:<8.1f} | {e:<8.2f}% | {exp:<6.2f} | {diagnosis}")
