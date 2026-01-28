@@ -8,12 +8,12 @@ PATH_FAILURES = "dataset/failures/"
 MODEL_OUTPUT = "technical_model.xml"
 
 RANGES = {
-    'sharpness': {'low': (10, 59), 'med': (60,100) , 'high': (101,300)},
-    'edges': {'low': (0, 4.9), 'med': (5.0,12.0) , 'high': (12.1,40.0)},
-    'entropy': {'low': (0, 3.5), 'med': (3.6,6.5) , 'high': (6.6,8.0)},
-    'gradient': {'low': (0, 15), 'med': (16,40) , 'high': (41,100)},
-    'ratio': {'low': (0, 0.5), 'med': (0.51,1.5) , 'high': (1.51,10.0)},
-    'exposure':{'ok': (0.0, 0.3)}}
+    'sharpness': {'low': (10, 59), 'med': (60, 100) , 'high': (101, 300)},
+    'edges':     {'low': (0, 4.9), 'med': (5.0, 12.0) , 'high': (12.1, 40.0)},
+    'entropy':   {'low': (0, 3.5), 'med': (3.6, 6.5) , 'high': (6.6, 8.0)},
+    'gradient':  {'low': (0, 15), 'med': (16, 40) , 'high': (41, 100)},
+    'ratio':     {'low': (0, 0.5), 'med': (0.51, 1.5) , 'high': (1.51, 10.0)},
+    'exposure':  {'ok': (0.0, 0.35), 'dark': (0.36, 0.54), 'bad': (0.55, 1.0)}}
 
 def extract_features_from_image(img):
     """Extract features from a given image."""
@@ -74,7 +74,7 @@ def extract_features_from_image(img):
         print(f"Error processing image {img}: {e}")
         return None
 
-def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
+def _generate_synthetic_rule_data(samples_per_rule=(None, 50)):
     """Generate synthetic data based on predefined rules."""
     data = []
     labels = []
@@ -84,62 +84,35 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 300)):
         min_val, max_val = RANGES[metric][value]
         return random.uniform(min_val, max_val)
     
-    ## ---- RULE 1: BLUR IMAGES ---- ##
+    # 1. BAD EXPOSURE 
     for _ in range(samples_per_rule[1]):
-        vec = [val('sharpness', 'low'),
-               val('edges', 'low'),
-               val('entropy', 'low'),
-               val('gradient', 'low'),
-               val('ratio', 'low'),
-               val('exposure', 'ok')]
-        data.append(vec)
-        labels.append(0)  # REPROVED
+        s = random.uniform(10, 300)
+        e = val('edges', 'med')
+       
+        vec = [s, e, val('exposure', 'bad'), val('gradient', 'high'), val('entropy', 'med'), s/(e+1e-5)]
+        data.append(vec); labels.append(0)
+
+    # 2. NOISY / BLURRY IMAGES
+    for _ in range(samples_per_rule[1]):
+        s = val('sharpness', 'low')
+        e = val('edges', 'low')
         
-    ## ---- RULE 2: FOCUS ERROR ---- ##
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'high'), s/(e+1e-5)]
+        data.append(vec); labels.append(0)
+
+    # 3. LANDSCAPE / CLEAN 
     for _ in range(samples_per_rule[1]):
-        vec = [val('sharpness', 'low'),
-               val('edges', 'low'),
-               val('entropy', 'med'),
-                val('gradient', 'low'),
-                val('ratio', 'low'),
-                val('exposure', 'ok')]
-        data.append(vec)
-        labels.append(0)  # REPROVED
-        
-    ## ---- RULE 3: Bokeh rule ---- ##
-    for _ in range(samples_per_rule[1]):
-        vec = [val('sharpness', 'med'),
-               val('edges', 'med'),
-               val('entropy', 'med'),
-               val('gradient', 'med'),
-                val('ratio', 'high'),
-               val('exposure', 'ok')]
-        data.append(vec)
-        labels.append(1)  # APPROVED
-    
-    ## ---- RULE 4: Minimalism ---- ##
-    
-    for _ in range(samples_per_rule[1]):
-        vec = [val('sharpness', 'low'),
-               val('edges', 'low'),
-               val('entropy', 'low'),
-               val('gradient', 'low'),
-               val('ratio', 'low'),
-               val('exposure', 'ok')]
-        data.append(vec)
-        labels.append(1)  # APPROVED
-    
-    ## ---- RULE 5: ISO GRANULATED ---- ##
-    for _ in range(samples_per_rule[1]):
-        vec = [val('sharpness', 'high'),
-               val('edges', 'high'),
-               val('entropy', 'high'),
-               val('gradient', 'high'),
-               val('ratio', 'high'),
-               val('exposure', 'ok')
-               ]
-        data.append(vec)
-        labels.append(0)  # REPROVED
+        s = val('sharpness', 'med')
+        e = val('edges', 'low')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'low'), s/(e+1e-5)]
+        data.append(vec); labels.append(1)
+
+    # 4. GENERIC GOOD 
+    for _ in range(samples_per_rule[1] * 2):
+        s = val('sharpness', 'high')
+        e = val('edges', 'med')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'high'), val('entropy', 'med'), s/(e+1e-5)]
+        data.append(vec); labels.append(1)
     
     return data, labels
 
@@ -149,15 +122,17 @@ def train():
     final_labels = []
     print("📂 Processing images and generating synthetic data...")
     count_imgs = 0
+    real_data_multiplier = 15
     
     if os.path.exists(PATH_APPROVEDS):
         for f in os.listdir(PATH_APPROVEDS):
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
                 features = extract_features_from_image(os.path.join(PATH_APPROVEDS, f))
                 if features and all(isinstance(feat, (int, float, np.number)) for feat in features):
-                    final_data.append(features)
-                    final_labels.append(1)  # APPROVED
-                    count_imgs += 1
+                    for _ in range(real_data_multiplier):
+                        final_data.append(features)
+                        final_labels.append(1)  # APPROVED
+                        count_imgs += 1
                 else:
                     print(f"Skipped approved image {f}: features={features}")
     
@@ -166,16 +141,17 @@ def train():
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
                 features = extract_features_from_image(os.path.join(PATH_FAILURES, f))
                 if features and all(isinstance(feat, (int, float, np.number)) for feat in features):
-                    final_data.append(features)
-                    final_labels.append(0)  # REPROVED
-                    count_imgs += 1
+                    for _ in range(real_data_multiplier):   
+                        final_data.append(features)
+                        final_labels.append(0)  # REPROVED
+                        count_imgs += 1
                 else:
                     print(f"Skipped failure image {f}: features={features}")
     print(f"✅ Processed {count_imgs} images from dataset folders.")
     synth_data, synth_labels = _generate_synthetic_rule_data(samples_per_rule=(None, 300))
     final_data.extend(synth_data)
     final_labels.extend(synth_labels)
-    print(f"✅ Generated {len(synth_data)} synthetic data based on rules.")
+    print(f"✅ Generated {len(synth_data)} synthetic data based on rules. ")
     
     train_matrix = np.array(final_data, dtype=np.float32)
     labels_matrix = np.array(final_labels, dtype=np.int32)
@@ -187,8 +163,8 @@ def train():
     print("⚙️ Training the model...")
     
     rf = cv2.ml.RTrees_create()
-    rf.setMaxDepth(12)
-    rf.setMinSampleCount(4)
+    rf.setMaxDepth(10)
+    rf.setMinSampleCount(2)
     rf.setRegressionAccuracy(0)
     rf.setMaxCategories(2)
     rf.setPriors(np.zeros(0))
@@ -197,7 +173,7 @@ def train():
     rf.train(tdata)
     rf.save(MODEL_OUTPUT)
     
-    print(f"✅ Model trained and saved to {MODEL_OUTPUT}")
+    print(f"✅ Model V3 trained and saved to {MODEL_OUTPUT}")
     print(f"📊 Total samples used: {len(final_data)}")
     print(f"📊 Features per sample: {len(final_data[0]) if final_data else 0}")
     print("🎉 Training completed successfully!")
