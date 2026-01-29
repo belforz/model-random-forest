@@ -12,7 +12,7 @@ RANGES = {
     'edges':     {'low': (0, 4.9), 'med': (5.0, 15.0) , 'high': (15.1, 50.0)},
     'entropy':   {'low': (0, 4.5), 'med': (4.6, 7.0) , 'high': (7.1, 10.0)},
     'gradient':  {'low': (0, 25), 'med': (26, 60) , 'high': (61, 200)},
-    'exposure':  {'ok': (0.0, 0.40), 'bad': (0.42, 1.0)}
+    'exposure':  {'ok': (0.0, 0.48), 'bad': (0.52, 1.0)}
 }
 
 def extract_features_from_image(img):
@@ -88,36 +88,62 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 80)):
         return np.tanh(s / (e * 50.0 + 1.0))
     
    
-    # 1. Toxic Brightness
+    # 1. Toxic Brightness (bad quality - low scores)
     for _ in range(samples_per_rule[1]):
         s, e = val('sharpness', 'high'), val('edges', 'med')
         vec = [s, e, val('exposure', 'bad'), val('gradient', 'high'), random.uniform(4,9), calc_ratio(s,e)]
-        data.append(vec); labels.append(0.0)
+        data.append(vec); labels.append(random.uniform(0.0, 0.2))
 
-    # 2. Blur
+    # 2. Blur (bad quality - low scores)
     for _ in range(samples_per_rule[1]):
         s, e = val('sharpness', 'low'), val('edges', 'low')
         vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'high'), calc_ratio(s,e)]
-        data.append(vec); labels.append(0.0)
+        data.append(vec); labels.append(random.uniform(0.0, 0.25))
 
-    # 3. Fake Landscape 
+    # 3. Fake Landscape (poor quality)
     for _ in range(samples_per_rule[1]):
         s, e = val('sharpness', 'low'), val('edges', 'low')
         vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'med'), calc_ratio(s,e)]
-        data.append(vec); labels.append(0.0)
+        data.append(vec); labels.append(random.uniform(0.15, 0.35))
 
-    
-    # 4. True Landscape
+    # 4. True Landscape (good quality)
     for _ in range(samples_per_rule[1]):
         s, e = val('sharpness', 'med'), val('edges', 'low')
         vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'low'), calc_ratio(s,e)]
-        data.append(vec); labels.append(1.0)
+        data.append(vec); labels.append(random.uniform(0.7, 0.9))
 
-    # 5. Generic Good
+    # 5. Generic Good (high quality - high scores)
     for _ in range(samples_per_rule[1] * 2):
         s, e = val('sharpness', 'high'), val('edges', 'med')
         vec = [s, e, val('exposure', 'ok'), val('gradient', 'high'), val('entropy', 'med'), calc_ratio(s,e)]
-        data.append(vec); labels.append(1.0)
+        data.append(vec); labels.append(random.uniform(0.8, 1.0))
+        
+    # ---------------- Confusion Zone Samples (Regression Smoothing) ----------------
+    for _ in range(samples_per_rule[1] * 3):  # More samples in confusion zone
+        s = random.uniform(2000, 5000)
+        e = val('edges', 'med')
+        exp = random.uniform(0.45 , 0.55)
+        vec = [s, e, exp, val('gradient', 'high'), val('entropy', 'med'), calc_ratio(s,e)]
+        data.append(vec)
+        confidence = 0.5 + (0.5 - exp) * 2.0
+        confidence = np.clip(confidence, 0.2, 0.8)
+        labels.append(confidence)
+    
+    for _ in range(samples_per_rule[1] * 2):  # More samples
+        s = random.uniform(200, 400)
+        e = random.uniform(3.5, 5.5)
+        ent = random.uniform(4.5, 6.0)
+        vec = [s, e, 0.2, 30, ent, calc_ratio(s,e)]
+        data.append(vec)
+        confidence = np.clip(0.65 - (ent - 4.5) * 0.25, 0.2, 0.65)
+        labels.append(confidence)
+    
+    # 6. Medium Quality Samples (NEW - more variety)
+    for _ in range(samples_per_rule[1] * 2):
+        s = val('sharpness', 'med')
+        e = val('edges', 'med')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'med'), val('entropy', 'med'), calc_ratio(s,e)]
+        data.append(vec); labels.append(random.uniform(0.35, 0.75))
     
     return data, labels
 
@@ -136,7 +162,7 @@ def train():
                 if features and all(isinstance(feat, (int, float, np.number)) for feat in features):
                     for _ in range(real_data_multiplier):
                         final_data.append(features)
-                        final_labels.append(1)  # APPROVED
+                        final_labels.append(random.uniform(0.75, 1.0))  # More variance: 0.75-1.0
                         count_imgs += 1
                 else:
                     print(f"Skipped approved image {f}: features={features}")
@@ -148,7 +174,7 @@ def train():
                 if features and all(isinstance(feat, (int, float, np.number)) for feat in features):
                     for _ in range(real_data_multiplier):   
                         final_data.append(features)
-                        final_labels.append(0)  # REPROVED
+                        final_labels.append(random.uniform(0.0, 0.25))  # More variance: 0.0-0.25
                         count_imgs += 1
                 else:
                     print(f"Skipped failure image {f}: features={features}")
@@ -159,20 +185,19 @@ def train():
     print(f"✅ Generated {len(synth_data)} synthetic data based on rules. ")
     
     train_matrix = np.array(final_data, dtype=np.float32)
-    labels_matrix = np.array(final_labels, dtype=np.int32)
+    labels_matrix = np.array(final_labels, dtype=np.float32)
     
     print("🤖 Dataset is mounted: ")
     print(f" - Real Imasges: {count_imgs}")
     print(f" - Synthetic Data: {len(synth_data)}")
     print(f" - Total Samples: {len(final_data)}")
-    print("⚙️ Training the model...")
+    print("⚙️ Training regression model (continuous output 0.0-1.0)...")
     
     rf = cv2.ml.RTrees_create()
-    rf.setMaxDepth(12)
-    rf.setMinSampleCount(5)
-    rf.setRegressionAccuracy(0.0001)
-    rf.setMaxCategories(2)
-    
+    rf.setMaxDepth(15)  # Increased for more nuance
+    rf.setMinSampleCount(5)  # Reduced for finer splits
+    rf.setRegressionAccuracy(0.00001)  # Higher precision
+    rf.setTermCriteria((cv2.TERM_CRITERIA_MAX_ITER + cv2.TERM_CRITERIA_EPS, 150, 0.005))
     tdata = cv2.ml.TrainData_create(train_matrix, cv2.ml.ROW_SAMPLE, labels_matrix)
     rf.train(tdata)
     rf.save(MODEL_OUTPUT)

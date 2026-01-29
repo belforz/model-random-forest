@@ -71,8 +71,8 @@ def find_the_culprits():
     errors_found = 0
     
     print(f"Analyzing folder: {PATH_APROVADAS}...\n")
-    print(f"{'FILE':<30} | {'SHARPNESS':<8} | {'EDGES':<8} | {'EXP':<6} | {'DIAGNOSIS'}")
-    print("-" * 90)
+    print(f"{'FILE':<30} | {'SCORE':<8} | {'SHARPNESS':<8} | {'EDGES':<8} | {'EXP':<6} | {'DIAGNOSIS'}")
+    print("-" * 110)
 
     for f in os.listdir(PATH_APROVADAS):
         if f.lower().endswith(('jpg', 'png', 'jpeg')):
@@ -82,7 +82,8 @@ def find_the_culprits():
             if feats:
                 # Make the prediction
                 sample = np.array([feats], dtype=np.float32)
-                prediction = int(model.predict(sample)[0])
+                raw_score = model.predict(sample)[1][0][0]
+                prediction = 1 if raw_score >= 0.5 else 0
                 
                
                 if prediction == 0:
@@ -100,9 +101,9 @@ def find_the_culprits():
                     elif r > 0.9: diagnosis = "High sharpness to edge ratio (>0.9)"
                     else: diagnosis = "Complex combination"
 
-                    print(f"{f:<30} | {s:<8.1f} | {e:<8.2f}% | {exp:<6.2f} | {diagnosis}")
+                    print(f"{f:<30} | {raw_score:<8.4f} | {s:<8.1f} | {e:<8.2f}% | {exp:<6.2f} | {diagnosis}")
 
-    print("-" * 90)
+    print("-" * 110)
     print(f"Total False Negatives found: {errors_found}")
     print("Tip: Open the images and review by yourself")
 

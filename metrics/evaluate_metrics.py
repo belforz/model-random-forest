@@ -75,10 +75,11 @@ def evaluate():
             if feats:
                 # OpenCV prediction requires samples as float32 numpy arrays    
                 sample = np.array([feats], dtype=np.float32)
-                prediction = model.predict(sample)[0] 
+                raw_score = model.predict(sample)[1][0][0]
+                prediction = 1 if raw_score >= 0.5 else 0
                 
                 y_true.append(1)
-                y_pred.append(int(prediction))
+                y_pred.append(prediction)
 
     # Process Rejected (Expected: 0)
     print("Testing class 'Rejected'...")
@@ -87,10 +88,11 @@ def evaluate():
             feats = extract_features(os.path.join(PATH_REJECTED, f))
             if feats:
                 sample = np.array([feats], dtype=np.float32)
-                prediction = model.predict(sample)[0]
+                raw_score = model.predict(sample)[1][0][0]
+                prediction = 1 if raw_score >= 0.5 else 0
                 
                 y_true.append(0)
-                y_pred.append(int(prediction))
+                y_pred.append(prediction)
 
     # Final Report
     print("\n" + "="*40)
