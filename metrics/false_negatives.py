@@ -50,7 +50,7 @@ def extract_features(image_path):
     hist_norm = hist_norm[hist_norm > 0]
     entropy = -np.sum(hist_norm * np.log2(hist_norm))
     
-    ratio = sharpness / (edge_density + 1e-5)
+    ratio = np.tanh(sharpness / (edge_density * 50.0 + 1.0))
         
     return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio]
 
@@ -97,7 +97,7 @@ def find_the_culprits():
                     elif exp > 0.3: diagnosis = "Poor exposure (>30%)"
                     elif ent > 7.5: diagnosis = "High entropy/noise"
                     elif g < 15: diagnosis = "Low gradient (<15)"
-                    elif r > 10: diagnosis = "High sharpness to edge ratio (>10)"
+                    elif r > 0.9: diagnosis = "High sharpness to edge ratio (>0.9)"
                     else: diagnosis = "Complex combination"
 
                     print(f"{f:<30} | {s:<8.1f} | {e:<8.2f}% | {exp:<6.2f} | {diagnosis}")

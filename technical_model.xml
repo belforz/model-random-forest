@@ -10,9 +10,9 @@
   <training_params>
     <use_surrogates>0</use_surrogates>
     <max_categories>2</max_categories>
-    <regression_accuracy>0.</regression_accuracy>
-    <max_depth>10</max_depth>
-    <min_sample_count>2</min_sample_count>
+    <regression_accuracy>9.9999997473787516e-05</regression_accuracy>
+    <max_depth>12</max_depth>
+    <min_sample_count>5</min_sample_count>
     <cross_validation_folds>0</cross_validation_folds>
     <nactive_vars>0</nactive_vars></training_params>
   <global_var_idx>1</global_var_idx>
@@ -26,7 +26,7 @@
     0 1</class_labels>
   <missing_subst>
     0. 0. 0. 0. 0. 0. 0.</missing_subst>
-  <oob_error>0.031198686371100164</oob_error>
+  <oob_error>0.061518324607329845</oob_error>
   <ntrees>1</ntrees>
   <trees>
     <_>
@@ -36,107 +36,55 @@
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>2</var>
-              <quality>3413.0048828125</quality>
-              <le>0.37043771147727966</le></_></splits></_>
-        <_>
-          <depth>1</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx>
-          <splits>
-            <_><var>0</var>
-              <quality>1179.</quality>
-              <le>59.490341186523438</le></_></splits></_>
-        <_>
-          <depth>2</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>2</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx></_>
-        <_>
-          <depth>1</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
             <_><var>3</var>
-              <quality>2781.9853515625</quality>
+              <quality>2741.954345703125</quality>
               <le>28.606239318847656</le></_></splits></_>
         <_>
+          <depth>1</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>1376.511962890625</quality>
+              <le>0.44190138578414917</le></_></splits></_>
+        <_>
           <depth>2</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>5</var>
-              <quality>1335.9931640625</quality>
-              <le>3.3892597062212815e-10</le></_></splits></_>
+            <_><var>4</var>
+              <quality>235.14285278320312</quality>
+              <le>4.5660638809204102</le></_></splits></_>
         <_>
           <depth>3</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx>
           <splits>
-            <_><var>5</var>
-              <quality>34.</quality>
-              <le>4.837529335444124e-11</le></_></splits></_>
+            <_><var>3</var>
+              <quality>112.72340393066406</quality>
+              <le>2.1844558715820312</le></_></splits></_>
         <_>
           <depth>4</depth>
           <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>1</var>
+              <quality>47.</quality>
+              <le>0.20113466680049896</le></_></splits></_>
+        <_>
+          <depth>5</depth>
+          <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>5</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
         <_>
           <depth>4</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx></_>
         <_>
           <depth>3</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>4</var>
-              <quality>1324.820068359375</quality>
-              <le>0.043523762375116348</le></_></splits></_>
-        <_>
-          <depth>4</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>0</var>
-              <quality>387.87619018554688</quality>
-              <le>2.2939152586332057e-06</le></_></splits></_>
-        <_>
-          <depth>5</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>5</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>4</var>
-              <quality>79.64935302734375</quality>
-              <le>0.016891276463866234</le></_></splits></_>
-        <_>
-          <depth>6</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx></_>
-        <_>
-          <depth>6</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>4</var>
-              <quality>77.</quality>
-              <le>0.042752280831336975</le></_></splits></_>
-        <_>
-          <depth>7</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>7</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx></_>
-        <_>
-          <depth>4</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
@@ -145,74 +93,34 @@
           <norm_class_idx>0</norm_class_idx>
           <splits>
             <_><var>1</var>
-              <quality>1551.059326171875</quality>
-              <le>21.832195281982422</le></_></splits></_>
+              <quality>1217.2630615234375</quality>
+              <le>2.0828452110290527</le></_></splits></_>
+        <_>
+          <depth>3</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
         <_>
           <depth>3</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>0</var>
-              <quality>1107.3900146484375</quality>
-              <le>5.6980571746826172</le></_></splits></_>
+            <_><var>1</var>
+              <quality>394.01931762695312</quality>
+              <le>2.3142905235290527</le></_></splits></_>
+        <_>
+          <depth>4</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
         <_>
           <depth>4</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
             <_><var>1</var>
-              <quality>878.94415283203125</quality>
-              <le>4.04150390625</le></_></splits></_>
+              <quality>369.92416381835938</quality>
+              <le>3.3865561485290527</le></_></splits></_>
         <_>
           <depth>5</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>0</var>
-              <quality>265.69512939453125</quality>
-              <le>1.1528603636179469e-06</le></_></splits></_>
-        <_>
-          <depth>6</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>6</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>0</var>
-              <quality>119.467529296875</quality>
-              <le>1.6739103330110083e-06</le></_></splits></_>
-        <_>
-          <depth>7</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx></_>
-        <_>
-          <depth>7</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>2</var>
-              <quality>116.56818389892578</quality>
-              <le>7.3692874908447266</le></_></splits></_>
-        <_>
-          <depth>8</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>1</var>
-              <quality>88.</quality>
-              <le>3.1383132934570312</le></_></splits></_>
-        <_>
-          <depth>9</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>9</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx></_>
-        <_>
-          <depth>8</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
@@ -220,91 +128,379 @@
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>0</var>
-              <quality>675.16064453125</quality>
-              <le>4.0070666727842763e-05</le></_></splits></_>
+            <_><var>5</var>
+              <quality>192.02040100097656</quality>
+              <le>1.9964763349478165e-12</le></_></splits></_>
+        <_>
+          <depth>6</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
         <_>
           <depth>6</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>2</var>
-              <quality>626.10125732421875</quality>
-              <le>6.5403833389282227</le></_></splits></_>
+            <_><var>5</var>
+              <quality>196.</quality>
+              <le>2.0980793991043356e-08</le></_></splits></_>
         <_>
           <depth>7</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
           <depth>7</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>1</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>2</var>
-              <quality>513.04388427734375</quality>
-              <le>7.3831815719604492</le></_></splits></_>
-        <_>
-          <depth>8</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx>
           <splits>
             <_><var>1</var>
-              <quality>353.37255859375</quality>
-              <le>7.2478299140930176</le></_></splits></_>
+              <quality>1522.4725341796875</quality>
+              <le>18.219400405883789</le></_></splits></_>
         <_>
-          <depth>9</depth>
+          <depth>2</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>1069.0892333984375</quality>
+              <le>0.41612279415130615</le></_></splits></_>
+        <_>
+          <depth>3</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>3</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>4</var>
+              <quality>973.045166015625</quality>
+              <le>0.47281414270401001</le></_></splits></_>
+        <_>
+          <depth>4</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>1</var>
+              <quality>774.50146484375</quality>
+              <le>3.1801426410675049</le></_></splits></_>
+        <_>
+          <depth>5</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>5</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>4</var>
+              <quality>716.29986572265625</quality>
+              <le>0.020618489012122154</le></_></splits></_>
+        <_>
+          <depth>6</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>174.27174377441406</quality>
+              <le>7.3754630088806152</le></_></splits></_>
+        <_>
+          <depth>7</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx>
           <splits>
             <_><var>0</var>
-              <quality>228.7872314453125</quality>
-              <le>1.6074710629254696e-07</le></_></splits></_>
+              <quality>127.1351318359375</quality>
+              <le>7.2823104346753098e-06</le></_></splits></_>
         <_>
-          <depth>10</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>10</depth>
+          <depth>8</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>8</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>0</var>
+              <quality>37.</quality>
+              <le>7.9216952144633979e-06</le></_></splits></_>
         <_>
           <depth>9</depth>
           <value>0.</value>
-          <norm_class_idx>0</norm_class_idx>
-          <splits>
-            <_><var>0</var>
-              <quality>200.11288452148438</quality>
-              <le>2.8232580007170327e-06</le></_></splits></_>
+          <norm_class_idx>0</norm_class_idx></_>
         <_>
-          <depth>10</depth>
+          <depth>9</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx></_>
         <_>
-          <depth>10</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
-        <_>
-          <depth>8</depth>
+          <depth>7</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
             <_><var>3</var>
-              <quality>265.74041748046875</quality>
-              <le>71.600593566894531</le></_></splits></_>
+              <quality>66.</quality>
+              <le>37.402420043945312</le></_></splits></_>
+        <_>
+          <depth>8</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>8</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>67.5</quality>
+              <le>7.4632711410522461</le></_></splits></_>
+        <_>
+          <depth>9</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>9</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>48.</quality>
+              <le>7.5100021362304688</le></_></splits></_>
+        <_>
+          <depth>10</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>10</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>6</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>3</var>
+              <quality>593.27484130859375</quality>
+              <le>42.224395751953125</le></_></splits></_>
+        <_>
+          <depth>7</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>4</var>
+              <quality>239.23558044433594</quality>
+              <le>0.44705241918563843</le></_></splits></_>
+        <_>
+          <depth>8</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>0</var>
+              <quality>223.92332458496094</quality>
+              <le>3.8531089785465156e-07</le></_></splits></_>
+        <_>
+          <depth>9</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>3</var>
+              <quality>73.</quality>
+              <le>37.803565979003906</le></_></splits></_>
+        <_>
+          <depth>10</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>10</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>9</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>193.08428955078125</quality>
+              <le>7.0861654281616211</le></_></splits></_>
+        <_>
+          <depth>10</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>1</var>
+              <quality>95.800003051757812</quality>
+              <le>5.2203779220581055</le></_></splits></_>
+        <_>
+          <depth>11</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>11</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>5</var>
+              <quality>53.506851196289062</quality>
+              <le>2.6152828791481397e-09</le></_></splits></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>10</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>1</var>
+              <quality>134.15707397460938</quality>
+              <le>10.22900390625</le></_></splits></_>
+        <_>
+          <depth>11</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>4</var>
+              <quality>136.122802734375</quality>
+              <le>0.11594563722610474</le></_></splits></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>11</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>8</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>7</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>0</var>
+              <quality>428.66110229492188</quality>
+              <le>1.7553593352204189e-05</le></_></splits></_>
+        <_>
+          <depth>8</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>5</var>
+              <quality>338.98883056640625</quality>
+              <le>1.0273173423058779e-08</le></_></splits></_>
         <_>
           <depth>9</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
             <_><var>1</var>
-              <quality>210.75746154785156</quality>
-              <le>12.247396469116211</le></_></splits></_>
+              <quality>228.60498046875</quality>
+              <le>7.9308271408081055</le></_></splits></_>
         <_>
           <depth>10</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
           <depth>10</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>5</var>
+              <quality>170.00727844238281</quality>
+              <le>1.1679337497128017e-09</le></_></splits></_>
+        <_>
+          <depth>11</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>5</var>
+              <quality>114.57142639160156</quality>
+              <le>8.2928615363631053e-11</le></_></splits></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>12</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>11</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>5</var>
+              <quality>95.414024353027344</quality>
+              <le>3.6793399438295182e-09</le></_></splits></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>12</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>9</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>8</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>0</var>
+              <quality>120.</quality>
+              <le>0.00085171801038086414</le></_></splits></_>
+        <_>
+          <depth>9</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>2</var>
+              <quality>146.08695983886719</quality>
+              <le>7.2229652404785156</le></_></splits></_>
+        <_>
+          <depth>10</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>10</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>4</var>
+              <quality>119.4339599609375</quality>
+              <le>0.070958659052848816</le></_></splits></_>
+        <_>
+          <depth>11</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx>
+          <splits>
+            <_><var>3</var>
+              <quality>38.931034088134766</quality>
+              <le>58.265571594238281</le></_></splits></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>12</depth>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
+        <_>
+          <depth>11</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx></_>
         <_>
@@ -312,23 +508,43 @@
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
-          <depth>6</depth>
-          <value>1.</value>
-          <norm_class_idx>1</norm_class_idx>
+          <depth>4</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>5</var>
+              <quality>240.42857360839844</quality>
+              <le>7.0605590818395569e-11</le></_></splits></_>
+        <_>
+          <depth>5</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
           <splits>
             <_><var>2</var>
-              <quality>131.</quality>
-              <le>6.7047519683837891</le></_></splits></_>
+              <quality>21.</quality>
+              <le>6.3961715698242188</le></_></splits></_>
         <_>
-          <depth>7</depth>
+          <depth>6</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
-          <depth>7</depth>
+          <depth>6</depth>
           <value>1.</value>
           <norm_class_idx>1</norm_class_idx></_>
         <_>
-          <depth>4</depth>
+          <depth>5</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx></_>
+        <_>
+          <depth>2</depth>
+          <value>0.</value>
+          <norm_class_idx>0</norm_class_idx>
+          <splits>
+            <_><var>0</var>
+              <quality>615.54547119140625</quality>
+              <le>4.6510165702784434e-05</le></_></splits></_>
+        <_>
+          <depth>3</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx></_>
         <_>
@@ -336,21 +552,21 @@
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>5</var>
-              <quality>526.86151123046875</quality>
-              <le>1.721323542369646e-06</le></_></splits></_>
+            <_><var>1</var>
+              <quality>108.55813598632812</quality>
+              <le>24.334297180175781</le></_></splits></_>
         <_>
           <depth>4</depth>
-          <value>0.</value>
-          <norm_class_idx>0</norm_class_idx></_>
+          <value>1.</value>
+          <norm_class_idx>1</norm_class_idx></_>
         <_>
           <depth>4</depth>
           <value>0.</value>
           <norm_class_idx>0</norm_class_idx>
           <splits>
-            <_><var>5</var>
-              <quality>130.</quality>
-              <le>1.9394542505324353e-06</le></_></splits></_>
+            <_><var>0</var>
+              <quality>86.</quality>
+              <le>4.7557772631989792e-05</le></_></splits></_>
         <_>
           <depth>5</depth>
           <value>1.</value>

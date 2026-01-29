@@ -8,12 +8,12 @@ PATH_FAILURES = "dataset/failures/"
 MODEL_OUTPUT = "technical_model.xml"
 
 RANGES = {
-    'sharpness': {'low': (10, 59), 'med': (60, 100) , 'high': (101, 300)},
-    'edges':     {'low': (0, 4.9), 'med': (5.0, 12.0) , 'high': (12.1, 40.0)},
-    'entropy':   {'low': (0, 3.5), 'med': (3.6, 6.5) , 'high': (6.6, 8.0)},
-    'gradient':  {'low': (0, 15), 'med': (16, 40) , 'high': (41, 100)},
-    'ratio':     {'low': (0, 0.5), 'med': (0.51, 1.5) , 'high': (1.51, 10.0)},
-    'exposure':  {'ok': (0.0, 0.35), 'dark': (0.36, 0.54), 'bad': (0.55, 1.0)}}
+    'sharpness': {'low': (0, 300), 'med': (301, 1500) , 'high': (1501, 15000)},
+    'edges':     {'low': (0, 4.9), 'med': (5.0, 15.0) , 'high': (15.1, 50.0)},
+    'entropy':   {'low': (0, 4.5), 'med': (4.6, 7.0) , 'high': (7.1, 10.0)},
+    'gradient':  {'low': (0, 25), 'med': (26, 60) , 'high': (61, 200)},
+    'exposure':  {'ok': (0.0, 0.40), 'bad': (0.42, 1.0)}
+}
 
 def extract_features_from_image(img):
     """Extract features from a given image."""
@@ -64,17 +64,17 @@ def extract_features_from_image(img):
         hist_norm = hist_norm[hist_norm > 0]
         entropy = -np.sum(hist_norm * np.log2(hist_norm))
         
-        # Ratio
-        ratio = sharpness /(edge_density + 1e-5)
+        # Ratio Tanh
+        
+        ratio_score = np.tanh(sharpness / (edge_density * 50.0 + 1.0))
         
         
-        
-        return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio]
+        return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio_score]
     except Exception as e:
         print(f"Error processing image {img}: {e}")
         return None
 
-def _generate_synthetic_rule_data(samples_per_rule=(None, 50)):
+def _generate_synthetic_rule_data(samples_per_rule=(None, 80)):
     """Generate synthetic data based on predefined rules."""
     data = []
     labels = []
@@ -84,35 +84,40 @@ def _generate_synthetic_rule_data(samples_per_rule=(None, 50)):
         min_val, max_val = RANGES[metric][value]
         return random.uniform(min_val, max_val)
     
-    # 1. BAD EXPOSURE 
+    def calc_ratio(s, e):
+        return np.tanh(s / (e * 50.0 + 1.0))
+    
+   
+    # 1. Toxic Brightness
     for _ in range(samples_per_rule[1]):
-        s = random.uniform(10, 300)
-        e = val('edges', 'med')
-       
-        vec = [s, e, val('exposure', 'bad'), val('gradient', 'high'), val('entropy', 'med'), s/(e+1e-5)]
-        data.append(vec); labels.append(0)
+        s, e = val('sharpness', 'high'), val('edges', 'med')
+        vec = [s, e, val('exposure', 'bad'), val('gradient', 'high'), random.uniform(4,9), calc_ratio(s,e)]
+        data.append(vec); labels.append(0.0)
 
-    # 2. NOISY / BLURRY IMAGES
+    # 2. Blur
     for _ in range(samples_per_rule[1]):
-        s = val('sharpness', 'low')
-        e = val('edges', 'low')
-        
-        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'high'), s/(e+1e-5)]
-        data.append(vec); labels.append(0)
+        s, e = val('sharpness', 'low'), val('edges', 'low')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'high'), calc_ratio(s,e)]
+        data.append(vec); labels.append(0.0)
 
-    # 3. LANDSCAPE / CLEAN 
+    # 3. Fake Landscape 
     for _ in range(samples_per_rule[1]):
-        s = val('sharpness', 'med')
-        e = val('edges', 'low')
-        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'low'), s/(e+1e-5)]
-        data.append(vec); labels.append(1)
+        s, e = val('sharpness', 'low'), val('edges', 'low')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'med'), calc_ratio(s,e)]
+        data.append(vec); labels.append(0.0)
 
-    # 4. GENERIC GOOD 
+    
+    # 4. True Landscape
+    for _ in range(samples_per_rule[1]):
+        s, e = val('sharpness', 'med'), val('edges', 'low')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'low'), val('entropy', 'low'), calc_ratio(s,e)]
+        data.append(vec); labels.append(1.0)
+
+    # 5. Generic Good
     for _ in range(samples_per_rule[1] * 2):
-        s = val('sharpness', 'high')
-        e = val('edges', 'med')
-        vec = [s, e, val('exposure', 'ok'), val('gradient', 'high'), val('entropy', 'med'), s/(e+1e-5)]
-        data.append(vec); labels.append(1)
+        s, e = val('sharpness', 'high'), val('edges', 'med')
+        vec = [s, e, val('exposure', 'ok'), val('gradient', 'high'), val('entropy', 'med'), calc_ratio(s,e)]
+        data.append(vec); labels.append(1.0)
     
     return data, labels
 
@@ -148,7 +153,7 @@ def train():
                 else:
                     print(f"Skipped failure image {f}: features={features}")
     print(f"✅ Processed {count_imgs} images from dataset folders.")
-    synth_data, synth_labels = _generate_synthetic_rule_data(samples_per_rule=(None, 300))
+    synth_data, synth_labels = _generate_synthetic_rule_data(samples_per_rule=(None, 80))
     final_data.extend(synth_data)
     final_labels.extend(synth_labels)
     print(f"✅ Generated {len(synth_data)} synthetic data based on rules. ")
@@ -163,11 +168,10 @@ def train():
     print("⚙️ Training the model...")
     
     rf = cv2.ml.RTrees_create()
-    rf.setMaxDepth(10)
-    rf.setMinSampleCount(2)
-    rf.setRegressionAccuracy(0)
+    rf.setMaxDepth(12)
+    rf.setMinSampleCount(5)
+    rf.setRegressionAccuracy(0.0001)
     rf.setMaxCategories(2)
-    rf.setPriors(np.zeros(0))
     
     tdata = cv2.ml.TrainData_create(train_matrix, cv2.ml.ROW_SAMPLE, labels_matrix)
     rf.train(tdata)

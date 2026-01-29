@@ -51,7 +51,7 @@ def extract_features(image_path):
     entropy = -np.sum(hist_norm * np.log2(hist_norm))
         
         # Ratio
-    ratio = sharpness / (edge_density + 1e-5)
+    ratio = np.tanh(sharpness / (edge_density * 50.0 + 1.0))
         
     return [sharpness, edge_density, entropy, mean_magnitude, exposure_ratio, ratio]
 
