@@ -2,3 +2,5 @@
 /dataset/approved/**
 /dataset/failures/**
 /dataset/approveds/**
+technical_model.xml
+output.json
