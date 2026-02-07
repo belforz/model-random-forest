@@ -1,4 +1,7 @@
 # Modelo de Avaliação de Qualidade de Imagens
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.8+-blue)](https://www.python.org/)
+[![uv](https://img.shields.io/badge/uv-Package%20Manager-green)](https://github.com/astral-sh/uv)
 
 Este projeto implementa um modelo de aprendizado de máquina para avaliação automática da qualidade de imagens. O modelo usa o regressor Random Trees do OpenCV para pontuar imagens em uma escala de 0 (qualidade ruim) a 1 (qualidade excelente) com base em várias características visuais.
 
