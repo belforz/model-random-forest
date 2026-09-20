@@ -1,0 +1,118 @@
+============================================================
+📊 AVALIANDO MODELO: technical_model.xml (ratio formula: old)
+============================================================
+Thresholds:
+  • Aprovado:  score >= 0.65
+  • Reprovado: score <  0.35
+  • Revisão:   0.35 <= score < 0.65
+============================================================
+
+🟢 Testando classe 'Aprovadas'...
+   Processadas: 49 imagens
+
+🔴 Testando classe 'Reprovadas'...
+   Processadas: 196 imagens
+
+============================================================
+📊 RELATÓRIO DE PERFORMANCE
+============================================================
+
+📈 Métricas Gerais:
+   Total testado:  245
+   Corretas:       139 (56.7%)
+   Erros:          106 (43.3%)
+
+🔢 Matriz de Confusão:
+   True Negative (TN):  102
+   False Positive (FP): 94
+   False Negative (FN): 12
+   True Positive (TP):  37
+
+------------------------------------------------------------
+               precision    recall  f1-score   support
+
+Reprovado (0)      0.895     0.520     0.658       196
+ Aprovado (1)      0.282     0.755     0.411        49
+
+     accuracy                          0.567       245
+    macro avg      0.589     0.638     0.535       245
+ weighted avg      0.772     0.567     0.609       245
+
+
+============================================================
+🔍 ANÁLISE DETALHADA DE ERROS
+============================================================
+
+❌ Total de erros: 143
+
+   good_IMG_6496.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.410)
+
+   good_IMG_6140.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.404)
+
+   good_F33DD8E9-C3EA-4DA4-AFD5-2B78B4E340B2.JPG
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.399)
+
+   good_FB01587C-280C-48D0-BB62-07D29E37CA40.JPG
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.517)
+
+   good_IMG_6153.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.406)
+
+   good_IMG_1201.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.352)
+
+   good_IMG_0785.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.529)
+
+   good_IMG_1165.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.368)
+
+   good_IMG_2147.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.355)
+
+   good_IMG_6861.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.363)
+
+
+============================================================
+🟡 CASOS DE REVISÃO HUMANA: 131
+============================================================
+
+Total: 131 imagens na zona cinzenta
+
+   good_IMG_6496.jpg
+      Esperado: Aprovado
+      Score: 0.410
+
+   good_IMG_6140.jpg
+      Esperado: Aprovado
+      Score: 0.404
+
+   good_F33DD8E9-C3EA-4DA4-AFD5-2B78B4E340B2.JPG
+      Esperado: Aprovado
+      Score: 0.399
+
+   good_FB01587C-280C-48D0-BB62-07D29E37CA40.JPG
+      Esperado: Aprovado
+      Score: 0.517
+
+   good_IMG_6153.jpg
+      Esperado: Aprovado
+      Score: 0.406
+
+
+============================================================
+✅ AVALIAÇÃO CONCLUÍDA
+============================================================

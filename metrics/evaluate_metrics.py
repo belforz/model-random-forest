@@ -1,101 +1,30 @@
-import cv2
-import numpy as np
+import sys
 import os
+import numpy as np
+import cv2
 from sklearn.metrics import classification_report, confusion_matrix
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from new_model import extract_raw_metrics, assemble_feature_vector
 
 # --- CONFIG ---
 PATH_APPROVEDS = "dataset/approveds/"
 PATH_REJECTED = "dataset/failures/"
-MODEL_PATH = "technical_model_v2.xml"
+MODEL_PATH = "new_technical_model.xml"
+RATIO_FORMULA = "new"  # "new" p/ new_technical_model.xml, "old" p/ technical_model.xml
 
 # Thresholds otimizados
 THRESHOLD_APPROVED = 0.65  # Aumentado de 0.50
 THRESHOLD_REJECTED = 0.35  # Novo threshold explícito
 
 
-def extract_features(image_path):
-    """Extrai as 10 features do modelo v2"""
-    img = cv2.imread(image_path)
-    if img is None:
+def extract_features(image_path, ratio_formula=RATIO_FORMULA):
+    """Extrai as 10 features usando o mesmo pipeline de new_model.py,
+    garantindo que o vetor bate exatamente com o que o modelo foi treinado."""
+    raw = extract_raw_metrics(image_path)
+    if raw is None:
         return None
-
-    h, w = img.shape[:2]
-    max_dim = 640
-    if max(h, w) > max_dim:
-        scale = max_dim / float(max(h, w))
-        new_w, new_h = int(w * scale), int(h * scale)
-        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    total_pixels = gray.size
-
-    try:
-        # [1] Sharpness
-        laplacian_var = cv2.Laplacian(gray, cv2.CV_64F)
-        stddev_lap = cv2.meanStdDev(laplacian_var)
-        sharpness = stddev_lap[0].item() ** 2
-
-        # [2] Edge Density
-        mean_val = np.mean(gray)
-        std_val = np.std(gray)
-        lower = max(0, mean_val - std_val)
-        upper = min(255, mean_val + std_val)
-        edges = cv2.Canny(gray, int(lower), int(upper))
-        edge_density = (np.count_nonzero(edges) / total_pixels) * 100.0
-
-        # [3] Saturation Mean
-        s_mean, s_std = cv2.meanStdDev(hsv[:, :, 1])
-        saturation_mean = s_mean[0][0]
-
-        # [4] Contrast
-        c_mean, c_std = cv2.meanStdDev(gray)
-        contrast_std = c_std[0][0]
-
-        # [5] Exposure Ratio
-        hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
-        exposure_ratio = (np.sum(hist[:31]) + np.sum(hist[225:])) / total_pixels
-
-        # [6] Gradient Magnitude
-        grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
-        grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
-        magnitude = cv2.magnitude(grad_x, grad_y)
-        mean_magnitude = np.mean(magnitude)
-
-        # [7] Entropy
-        hist_norm = hist.ravel() / total_pixels
-        hist_norm = hist_norm[hist_norm > 0]
-        entropy = -np.sum(hist_norm * np.log2(hist_norm))
-
-        # [8] Saturation Variance
-        saturation_var = s_std[0][0] ** 2
-
-        # [9] Dynamic Range
-        cdf = hist.cumsum()
-        cdf_normalized = cdf * (1.0 / cdf.max())
-        p5_idx = np.searchsorted(cdf_normalized, 0.05)
-        p95_idx = np.searchsorted(cdf_normalized, 0.95)
-        dynamic_range = float(p95_idx - p5_idx)
-
-        # [10] Texture Score (NOVO - substitui o Ratio tóxico)
-        texture_score = (sharpness * edge_density) / (1000.0 + exposure_ratio * 5000)
-        texture_score = min(texture_score, 10.0)
-
-        return [
-            sharpness,
-            edge_density,
-            saturation_mean,
-            contrast_std,
-            exposure_ratio,
-            mean_magnitude,
-            entropy,
-            saturation_var,
-            dynamic_range,
-            texture_score
-        ]
-    except Exception as e:
-        print(f"❌ Erro ao extrair features de {image_path}: {e}")
-        return None
+    return assemble_feature_vector(raw, ratio_formula)
 
 
 def classify_score(score):
@@ -108,9 +37,9 @@ def classify_score(score):
         return "Revisão Humana", 0.5  # Neutro para métricas
 
 
-def evaluate():
+def evaluate(model_path=MODEL_PATH, ratio_formula=RATIO_FORMULA):
     print("=" * 60)
-    print(f"📊 AVALIANDO MODELO V2: {MODEL_PATH}")
+    print(f"📊 AVALIANDO MODELO: {model_path} (ratio formula: {ratio_formula})")
     print("=" * 60)
     print(f"Thresholds:")
     print(f"  • Aprovado:  score >= {THRESHOLD_APPROVED}")
@@ -119,12 +48,11 @@ def evaluate():
     print("=" * 60)
 
     # Carregar modelo
-    if not os.path.exists(MODEL_PATH):
-        print(f"❌ ERRO: Modelo não encontrado em {MODEL_PATH}")
-        print(f"Execute primeiro: uv run python3 model_v2_improved.py")
+    if not os.path.exists(model_path):
+        print(f"❌ ERRO: Modelo não encontrado em {model_path}")
         return
 
-    model = cv2.ml.RTrees_load(MODEL_PATH)
+    model = cv2.ml.RTrees_load(model_path)
     if not model.isTrained():
         print("❌ Erro: Modelo não carregou corretamente.")
         return
@@ -138,7 +66,7 @@ def evaluate():
     approved_count = 0
     for f in os.listdir(PATH_APPROVEDS):
         if f.lower().endswith(('jpg', 'png', 'jpeg', 'webp')):
-            feats = extract_features(os.path.join(PATH_APPROVEDS, f))
+            feats = extract_features(os.path.join(PATH_APPROVEDS, f), ratio_formula)
             if feats:
                 sample = np.array([feats], dtype=np.float32)
                 raw_score = model.predict(sample)[1][0][0]
@@ -163,7 +91,7 @@ def evaluate():
     rejected_count = 0
     for f in os.listdir(PATH_REJECTED):
         if f.lower().endswith(('jpg', 'png', 'jpeg', 'webp')):
-            feats = extract_features(os.path.join(PATH_REJECTED, f))
+            feats = extract_features(os.path.join(PATH_REJECTED, f), ratio_formula)
             if feats:
                 sample = np.array([feats], dtype=np.float32)
                 raw_score = model.predict(sample)[1][0][0]

@@ -1,0 +1,118 @@
+============================================================
+📊 AVALIANDO MODELO: new_technical_model.xml (ratio formula: new)
+============================================================
+Thresholds:
+  • Aprovado:  score >= 0.65
+  • Reprovado: score <  0.35
+  • Revisão:   0.35 <= score < 0.65
+============================================================
+
+🟢 Testando classe 'Aprovadas'...
+   Processadas: 49 imagens
+
+🔴 Testando classe 'Reprovadas'...
+   Processadas: 196 imagens
+
+============================================================
+📊 RELATÓRIO DE PERFORMANCE
+============================================================
+
+📈 Métricas Gerais:
+   Total testado:  245
+   Corretas:       225 (91.8%)
+   Erros:          20 (8.2%)
+
+🔢 Matriz de Confusão:
+   True Negative (TN):  186
+   False Positive (FP): 10
+   False Negative (FN): 10
+   True Positive (TP):  39
+
+------------------------------------------------------------
+               precision    recall  f1-score   support
+
+Reprovado (0)      0.949     0.949     0.949       196
+ Aprovado (1)      0.796     0.796     0.796        49
+
+     accuracy                          0.918       245
+    macro avg      0.872     0.872     0.872       245
+ weighted avg      0.918     0.918     0.918       245
+
+
+============================================================
+🔍 ANÁLISE DETALHADA DE ERROS
+============================================================
+
+❌ Total de erros: 21
+
+   good_IMG_6140.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.184)
+
+   good_IMG_0785.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.235)
+
+   good_IMG_1165.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.325)
+
+   good_IMG_2147.jpg
+      Esperado: Aprovado
+      Obtido:   Revisão Humana (score: 0.592)
+
+   good_IMG_4146.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.191)
+
+   good_IMG_0485.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.184)
+
+   good_IMG_6106.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.250)
+
+   good_IMG_2111.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.154)
+
+   good_A801D24B-11F4-452D-81BB-5C0ED4758291.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.307)
+
+   good_IMG_5941.jpg
+      Esperado: Aprovado
+      Obtido:   Reprovado (score: 0.224)
+
+
+============================================================
+🟡 CASOS DE REVISÃO HUMANA: 11
+============================================================
+
+Total: 11 imagens na zona cinzenta
+
+   good_IMG_2147.jpg
+      Esperado: Aprovado
+      Score: 0.592
+
+   bad_motion_blur_IMG_0297.jpg
+      Esperado: Reprovado
+      Score: 0.630
+
+   bad_noise_IMG_0478.jpg
+      Esperado: Reprovado
+      Score: 0.355
+
+   bad_motion_blur_IMG_2150.jpg
+      Esperado: Reprovado
+      Score: 0.605
+
+   bad_focus_blur_IMG_6528.jpg
+      Esperado: Reprovado
+      Score: 0.386
+
+
+============================================================
+✅ AVALIAÇÃO CONCLUÍDA
+============================================================
