@@ -32,7 +32,7 @@ def apply_motion_blur(img):
     size = random.randint(8,20)
     kernel = np.zeros((size, size))  
     if random.choice([True, False]):
-        kernel[int((size-1)/2) :] = np.ones(size)
+        kernel[int((size-1)/2), :] = np.ones(size)
     else:
         kernel[:, int((size-1)/2) ] = np.ones(size)
     kernel /= size
